@@ -44,7 +44,7 @@
         }
 
         body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background-color: var(--background-color);
             color: var(--text-color);
             line-height: 1.6;
@@ -53,20 +53,23 @@
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 1rem;
         }
 
         .nav-container {
             background-color: var(--card-bg);
             box-shadow: var(--card-shadow);
             margin-bottom: 2rem;
-            border-radius: 1rem;
+            border-radius: 0.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
         .nav-links {
             display: flex;
             justify-content: center;
-            gap: 2rem;
+            gap: 1rem;
             list-style: none;
             padding: 1rem;
         }
@@ -86,13 +89,12 @@
         .nav-links a.active {
             background-color: var(--primary-color);
             color: white;
-            transform: translateY(-2px);
         }
 
         .card {
             background-color: var(--card-bg);
             padding: 1.5rem;
-            border-radius: 1rem;
+            border-radius: 0.5rem;
             box-shadow: var(--card-shadow);
             margin-bottom: 1.5rem;
             animation: fadeIn 0.5s ease;
@@ -106,6 +108,7 @@
             display: block;
             margin-bottom: 0.5rem;
             color: var(--text-color);
+            font-weight: 500;
         }
 
         .form-group input,
@@ -117,6 +120,7 @@
             border-radius: 0.5rem;
             background-color: var(--card-bg);
             color: var(--text-color);
+            font-size: 16px;
         }
 
         .btn {
@@ -126,6 +130,7 @@
             cursor: pointer;
             font-weight: 500;
             transition: all 0.3s ease;
+            font-size: 16px;
         }
 
         .btn:hover {
@@ -146,22 +151,86 @@
             display: none !important;
         }
 
-        .page {
-            display: block;
-            width: 100%;
-        }
-
         .statistics {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 1rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .statistics .card {
+            margin-bottom: 0;
+            text-align: center;
+        }
+
+        .statistics h3 {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .statistics p {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary-color);
         }
 
         #rideMap {
             height: 400px;
             border-radius: 0.5rem;
             margin: 1rem 0;
+            z-index: 1;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin: 1rem 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--card-bg);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+        }
+
+        .activity-item {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .split-bill-card {
+            margin-top: 1.5rem;
+        }
+
+        .split-details {
+            margin: 1rem 0;
+        }
+
+        .split-details ul {
+            list-style: none;
+            margin: 0.5rem 0;
+            padding-left: 1rem;
+        }
+
+        .split-actions {
+            margin-top: 1rem;
+            text-align: right;
         }
 
         .alert {
@@ -169,6 +238,11 @@
             border-radius: 0.5rem;
             margin-bottom: 1rem;
             animation: slideIn 0.3s ease;
+            position: fixed;
+            top: 1rem;
+            right: 1rem;
+            z-index: 1000;
+            max-width: 300px;
         }
 
         .alert-success {
@@ -181,9 +255,61 @@
             color: white;
         }
 
-        .auth-container {
-            max-width: 400px;
-            margin: 2rem auto;
+        .theme-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 1rem;
+            border-radius: 50%;
+            background-color: var(--card-bg);
+            border: none;
+            cursor: pointer;
+            box-shadow: var(--card-shadow);
+            z-index: 100;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0.5rem;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                padding: 0.5rem;
+            }
+
+            .nav-links a {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .statistics {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                padding: 1rem;
+            }
+
+            .btn {
+                width: 100%;
+                margin-bottom: 0.5rem;
+            }
+
+            .table-container {
+                margin: 0.5rem 0;
+            }
+
+            th,
+            td {
+                padding: 0.5rem;
+                font-size: 0.9rem;
+            }
+
+            .theme-toggle {
+                bottom: 10px;
+                right: 10px;
+            }
         }
 
         @keyframes fadeIn {
@@ -198,16 +324,14 @@
             }
         }
 
-        .theme-toggle {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 1rem;
-            border-radius: 50%;
-            background-color: var(--card-bg);
-            border: none;
-            cursor: pointer;
-            box-shadow: var(--card-shadow);
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+            }
+
+            to {
+                transform: translateX(0);
+            }
         }
     </style>
 </head>
