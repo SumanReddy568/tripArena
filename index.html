@@ -10,6 +10,14 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="icon" type="image/png" href="assets/delivery-bike.png">
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "po3chnv1wm");
+    </script>
     <style>
         :root {
             --primary-color: #6366f1;
@@ -25,15 +33,18 @@
         }
 
         [data-theme="dark"] {
-            --primary-color: #818cf8;
-            --secondary-color: #4f46e5;
-            --success-color: #34d399;
-            --background-color: #0f172a;
+            --primary-color: #6366f1;
+            --primary-hover: #4f46e5;
+            --secondary-color: #3730a3;
+            --success-color: #10b981;
+            --background-color: #0e0e0e;
             --text-color: #f1f5f9;
-            --border-color: #334155;
-            --card-bg: #1e293b;
+            --border-color: #1f1f1f;
+            --card-bg: #1a1a1a;
+            --danger-color: #ef4444;
             --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1);
         }
+
 
         * {
             margin: 0;
@@ -340,50 +351,48 @@
         <!-- Navigation -->
         <nav class="nav-container hidden" id="mainNav">
             <ul class="nav-links">
-                <li><a href="#" data-page="dashboard" class="active"><i class="fas fa-chart-line"></i> Dashboard</a>
+                <li><a href="#" data-page="dashboard" onclick="showPage('dashboard')"><i class="fas fa-chart-line"></i>
+                        Dashboard</a></li>
+                <li><a href="#" data-page="expenses" onclick="showPage('expenses')"><i class="fas fa-money-bill"></i>
+                        Expenses</a></li>
+                <li><a href="#" data-page="rides" onclick="showPage('rides')"><i class="fas fa-bicycle"></i> Rides</a>
                 </li>
-                <li><a href="#" data-page="expenses"><i class="fas fa-money-bill"></i> Expenses</a></li>
-                <li><a href="#" data-page="rides"><i class="fas fa-bicycle"></i> Rides</a></li>
-                <li><a href="#" data-page="logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                <li><a href="#" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
             </ul>
         </nav>
 
         <!-- Login Page -->
-        <div id="loginPage" class="page">
-            <div class="card">
-                <h2>Login</h2>
-                <form id="loginForm">
-                    <div class="form-group">
-                        <label for="loginUsername">Username</label>
-                        <input type="text" id="loginUsername" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="loginPassword">Password</label>
-                        <input type="password" id="loginPassword" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Login</button>
-                    <p>Don't have an account? <a href="#" data-page="signup">Sign up</a></p>
-                </form>
-            </div>
+        <div id="loginPage" class="page auth-container">
+            <h2>Login</h2>
+            <form onsubmit="login(event)">
+                <div class="form-group">
+                    <label for="loginUsername">Username</label>
+                    <input type="text" id="loginUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+                <p>Don't have an account? <a href="#" onclick="showPage('signup')">Sign up</a></p>
+            </form>
         </div>
 
-        <!-- Sign Up Page -->
-        <div id="signupPage" class="page hidden">
-            <div class="card">
-                <h2>Sign Up</h2>
-                <form id="signupForm">
-                    <div class="form-group">
-                        <label for="signupUsername">Username</label>
-                        <input type="text" id="signupUsername" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="signupPassword">Password</label>
-                        <input type="password" id="signupPassword" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary">Sign Up</button>
-                    <p>Already have an account? <a href="#" data-page="login">Login</a></p>
-                </form>
-            </div>
+        <!-- Signup Page -->
+        <div id="signupPage" class="page auth-container hidden">
+            <h2>Sign Up</h2>
+            <form onsubmit="signup(event)">
+                <div class="form-group">
+                    <label for="signupUsername">Username</label>
+                    <input type="text" id="signupUsername" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Sign Up</button>
+                <p>Already have an account? <a href="#" onclick="showPage('login')">Login</a></p>
+            </form>
         </div>
 
         <!-- Dashboard Page -->
@@ -400,7 +409,7 @@
                 </div>
                 <div class="card">
                     <h3>Total Expenses</h3>
-                    <p id="totalExpenses">₹0</p>
+                    <p id="totalExpenses">$0</p>
                 </div>
             </div>
             <div class="card">
@@ -411,10 +420,10 @@
 
         <!-- Expenses Page -->
         <div id="expensesPage" class="page hidden">
-            <h1>Expenses</h1>
+            <h1>Trips</h1>
             <div class="card">
                 <h2>Add New Trip</h2>
-                <form id="tripForm">
+                <form onsubmit="addTrip(event)">
                     <div class="form-group">
                         <label for="tripName">Trip Name</label>
                         <input type="text" id="tripName" required>
@@ -426,10 +435,9 @@
                     <button type="submit" class="btn btn-primary">Add Trip</button>
                 </form>
             </div>
-
             <div class="card">
                 <h2>Add New Expense</h2>
-                <form id="expenseForm">
+                <form onsubmit="addExpense(event)">
                     <div class="form-group">
                         <label for="tripSelect">Trip</label>
                         <select id="tripSelect" required>
@@ -444,10 +452,8 @@
                         <label for="expenseCategory">Category</label>
                         <select id="expenseCategory" required>
                             <option value="Fuel">Fuel</option>
-                            <option value="Food">Food</option>
-                            <option value="Accommodation">Accommodation</option>
-                            <option value="Transportation">Transportation</option>
-                            <option value="Activities">Activities</option>
+                            <option value="Maintenance">Maintenance</option>
+                            <option value="Equipment">Equipment</option>
                             <option value="Other">Other</option>
                         </select>
                     </div>
@@ -457,7 +463,7 @@
                     </div>
                     <div class="form-group">
                         <label for="expenseNotes">Notes</label>
-                        <textarea id="expenseNotes" rows="3"></textarea>
+                        <textarea id="expenseNotes"></textarea>
                     </div>
                     <button type="submit" class="btn btn-primary">Add Expense</button>
                 </form>
@@ -557,21 +563,6 @@
             const savedTheme = localStorage.getItem('theme') || 'light';
             document.documentElement.setAttribute('data-theme', savedTheme);
 
-            // Load data from localStorage
-            expenses = JSON.parse(localStorage.getItem('expenses')) || [];
-            rides = JSON.parse(localStorage.getItem('rides')) || [];
-            users = JSON.parse(localStorage.getItem('users')) || [];
-            trips = JSON.parse(localStorage.getItem('trips')) || [];
-
-            // Initialize trips select
-            updateTripList();
-
-            // Add event listeners
-            document.getElementById('loginForm')?.addEventListener('submit', login);
-            document.getElementById('signupForm')?.addEventListener('submit', signup);
-            document.getElementById('tripForm')?.addEventListener('submit', addTrip);
-            document.getElementById('expenseForm')?.addEventListener('submit', addExpense);
-
             const savedUser = localStorage.getItem('currentUser');
             if (savedUser) {
                 currentUser = savedUser;
@@ -581,6 +572,12 @@
             } else {
                 showPage('login');
             }
+
+            // Load expenses, trips, and rides from localStorage
+            expenses = JSON.parse(localStorage.getItem('expenses')) || [];
+            trips = JSON.parse(localStorage.getItem('trips')) || [];
+            rides = JSON.parse(localStorage.getItem('rides')) || [];
+            updateTripList();
         }
 
         function showPage(pageId) {
@@ -678,182 +675,110 @@
             }
 
             const tripId = document.getElementById('tripSelect').value;
-            const tripIndex = trips.findIndex(t => t.id === parseInt(tripId));
+            const trip = trips.find(t => t.id === parseInt(tripId));
 
-            if (tripIndex === -1) {
+            if (!trip) {
                 showAlert('Please select a valid trip.', 'danger');
-                return;
-            }
-
-            const amount = parseFloat(document.getElementById('expenseAmount').value);
-            if (isNaN(amount) || amount <= 0) {
-                showAlert('Please enter a valid amount.', 'danger');
                 return;
             }
 
             const expense = {
                 id: Date.now(),
-                amount: amount,
+                amount: parseFloat(document.getElementById('expenseAmount').value),
                 category: document.getElementById('expenseCategory').value,
                 date: document.getElementById('expenseDate').value,
-                notes: document.getElementById('expenseNotes').value.trim(),
+                notes: document.getElementById('expenseNotes').value,
                 user: currentUser
             };
 
-            trips[tripIndex].expenses.push(expense);
+            trip.expenses.push(expense);
+            expenses.push(expense);
+
             localStorage.setItem('trips', JSON.stringify(trips));
+            localStorage.setItem('expenses', JSON.stringify(expenses));
+
             showAlert('Expense added successfully!');
             event.target.reset();
-            updateExpenseTable(trips[tripIndex]);
+            updateExpenseTable(trip);
             updateDashboard();
         }
-
 
         function splitBill(tripId) {
             const trip = trips.find(t => t.id === parseInt(tripId));
 
             if (!trip) {
-                showAlert('Please select a trip first.', 'danger');
+                showAlert('Invalid trip selected.', 'danger');
                 return;
             }
 
             const totalExpenses = trip.expenses.reduce((sum, expense) => sum + expense.amount, 0);
             const memberCount = trip.members.length;
-            if (memberCount === 0) {
-                showAlert('No members found in this trip.', 'danger');
-                return;
-            }
-
             const amountPerMember = totalExpenses / memberCount;
 
-            // Remove existing split bill card if any
-            const existingSplitBill = document.querySelector('.split-bill-card');
-            if (existingSplitBill) {
-                existingSplitBill.remove();
-            }
-
             const splitBillContainer = document.createElement('div');
-            splitBillContainer.className = 'card split-bill-card';
-
-            const expensesByMember = trip.expenses.reduce((acc, expense) => {
-                acc[expense.user] = (acc[expense.user] || 0) + expense.amount;
-                return acc;
-            }, {});
+            splitBillContainer.className = 'card';
 
             splitBillContainer.innerHTML = `
                 <h2>Split Bill for "${trip.name}"</h2>
-                <div class="split-details">
-                    <p>Total Expenses: ₹${totalExpenses.toFixed(2)}</p>
-                    <p>Members: ${trip.members.length}</p>
-                    <p>Amount per member: ₹${amountPerMember.toFixed(2)}</p>
-                    
-                    <h3>Expenses by Member:</h3>
-                    <ul>
-                        ${Object.entries(expensesByMember).map(([member, amount]) => `
-                            <li>${member}: ₹${amount.toFixed(2)}</li>
-                        `).join('')}
-                    </ul>
-
-                    <h3>Settlements:</h3>
-                    <ul>
-                        ${trip.members.map(member => {
-                const paid = expensesByMember[member] || 0;
-                const diff = paid - amountPerMember;
-                return `<li>${member}: ${diff > 0 ?
-                    `To receive ₹${diff.toFixed(2)}` :
-                    `To pay ₹${Math.abs(diff).toFixed(2)}`}</li>`;
-            }).join('')}
-                    </ul>
-                </div>
-                <div class="split-actions">
-                    <button onclick="shareOnWhatsApp('${trip.name}', ${totalExpenses}, ${amountPerMember})" 
-                            class="btn btn-primary">
-                        <i class="fab fa-whatsapp"></i> Share on WhatsApp
-                    </button>
-                </div>
+                <p>Total Expenses: ₹${totalExpenses.toFixed(2)}</p>
+                <p>Amount per member: ₹${amountPerMember.toFixed(2)}</p>
+                <h3>Trip Members:</h3>
+                <ul>
+                ${trip.members.map(member => `<li>${member} - ₹${amountPerMember.toFixed(2)}</li>`).join('')}
+                </ul>
+                <button onclick="shareOnWhatsApp('${trip.name}', ${totalExpenses}, ${amountPerMember})" class="btn btn-primary">Share on WhatsApp</button>
             `;
 
             document.querySelector('.container').appendChild(splitBillContainer);
         }
 
-
         function shareOnWhatsApp(tripName, totalExpenses, amountPerMember) {
-            const message = `*Split Bill for "${tripName}"*\n\n` +
-                `Total Expenses: ₹${totalExpenses.toFixed(2)}\n` +
-                `Amount per member: ₹${amountPerMember.toFixed(2)}`;
-
+            const message = `*Split Bill for "${tripName}"*\n\nTotal Expenses: ₹${totalExpenses.toFixed(2)}\nAmount per member: ₹${amountPerMember.toFixed(2)}`;
             const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
             window.open(url, '_blank');
         }
 
-        document.getElementById('tripSelect')?.addEventListener('change', function () {
-            const tripId = this.value;
-            const trip = trips.find(t => t.id === parseInt(tripId));
-            if (trip) {
-                updateExpenseTable(trip);
-            }
-        });
 
         function updateExpenseTable() {
-            const tripSelect = document.getElementById('tripSelect');
-            if (!tripSelect || !tripSelect.value) return;
-
-            const trip = trips.find(t => t.id === parseInt(tripSelect.value));
-            if (!trip) return;
-
             const tbody = document.getElementById('expenseTableBody');
             tbody.innerHTML = '';
 
-            trip.expenses.forEach(expense => {
+            const userExpenses = expenses.filter(e => e.user === currentUser);
+
+            userExpenses.forEach(expense => {
                 const row = tbody.insertRow();
                 row.innerHTML = `
-                    <td>${new Date(expense.date).toLocaleDateString()}</td>
-                    <td>${expense.category}</td>
-                    <td>₹${expense.amount.toFixed(2)}</td>
-                    <td>${expense.notes || ''}</td>
-                    <td>
-                        <button onclick="deleteExpense(${expense.id}, ${trip.id})" class="btn btn-danger">Delete</button>
-                    </td>
-                `;
+      <td>${expense.date}</td>
+      <td>${expense.category}</td>
+      <td>₹${expense.amount.toFixed(2)}</td>
+      <td>${expense.notes}</td>
+      <td>
+        <button onclick="deleteExpense(${expense.id})" class="btn btn-danger">Delete</button>
+      </td>
+    `;
             });
         }
 
-        function deleteExpense(expenseId, tripId) {
-            if (!confirm('Are you sure you want to delete this expense?')) {
-                return;
-            }
 
-            const tripIndex = trips.findIndex(t => t.id === tripId);
-            if (tripIndex !== -1) {
-                trips[tripIndex].expenses = trips[tripIndex].expenses.filter(e => e.id !== expenseId);
-                localStorage.setItem('trips', JSON.stringify(trips));
-                updateExpenseTable(trips[tripIndex]);
+
+        function deleteExpense(expenseId) {
+            const expenseIndex = expenses.findIndex(e => e.id === expenseId);
+            if (expenseIndex !== -1) {
+                expenses.splice(expenseIndex, 1);
+                localStorage.setItem('expenses', JSON.stringify(expenses));
+                updateExpenseTable();
                 updateDashboard();
                 showAlert('Expense deleted successfully!');
             }
         }
 
-        let ridePath = null;
-        let rideCoordinates = [];
+
 
         function startRide() {
-            if (!navigator.geolocation) {
-                showAlert('Geolocation is not supported by your browser.', 'danger');
-                return;
-            }
-
-            const options = {
-                enableHighAccuracy: true,
-                timeout: 5000,
-                maximumAge: 0
-            };
-
             navigator.geolocation.getCurrentPosition(
                 (position) => {
                     const { latitude, longitude } = position.coords;
                     rideStartTime = new Date().getTime();
-                    rideCoordinates = [[latitude, longitude]];
-
                     currentRide = {
                         startLocation: { lat: latitude, lng: longitude },
                         endLocation: null,
@@ -861,78 +786,82 @@
                         startTime: rideStartTime,
                         type: document.getElementById('rideType').value,
                         notes: document.getElementById('rideNotes').value,
-                        user: currentUser,
-                        coordinates: rideCoordinates,
-                        lastLocation: { lat: latitude, lng: longitude }
+                        user: currentUser
                     };
 
                     document.getElementById('startRideButton').classList.add('hidden');
                     document.getElementById('activeRideInfo').classList.remove('hidden');
 
-                    // Initialize map
                     map = L.map('rideMap').setView([latitude, longitude], 13);
-                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-                    marker = L.marker([latitude, longitude]).addTo(map);
-                    ridePath = L.polyline(rideCoordinates, {
-                        color: getComputedStyle(document.documentElement)
-                            .getPropertyValue('--primary-color'),
-                        weight: 3
+                    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     }).addTo(map);
+                    marker = L.marker([latitude, longitude]).addTo(map);
 
-                    // Start tracking
+
                     currentRideInterval = setInterval(() => {
                         navigator.geolocation.getCurrentPosition(
-                            (newPosition) => updateRidePosition(newPosition),
-                            (error) => handleLocationError(error),
-                            options
+                            (newPosition) => {
+                                const { latitude: newLat, longitude: newLng } = newPosition.coords;
+                                marker.setLatLng([newLat, newLng]);
+                                map.setView([newLat, newLng]);
+
+                                if (currentRide.lastLocation) {
+                                    currentRide.distance += calculateDistance(
+                                        currentRide.lastLocation.lat,
+                                        currentRide.lastLocation.lng,
+                                        newLat,
+                                        newLng
+                                    );
+                                }
+                                currentRide.lastLocation = { lat: newLat, lng: newLng };
+                            },
+                            null,
+                            { enableHighAccuracy: true }
                         );
                     }, 5000);
                 },
-                (error) => handleLocationError(error),
-                options
+                (error) => {
+                    showAlert('Unable to get your location. Please try again.', 'danger');
+                }
             );
         }
 
-        function handleLocationError(error) {
-            let message;
-            switch (error.code) {
-                case error.PERMISSION_DENIED:
-                    message = "Location access denied. Please enable location services.";
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    message = "Location information unavailable.";
-                    break;
-                case error.TIMEOUT:
-                    message = "Location request timed out.";
-                    break;
-                default:
-                    message = "An unknown error occurred.";
-                    break;
-            }
-            showAlert(message, 'danger');
+        function stopRide() {
+            clearInterval(currentRideInterval);
+            const rideEndTime = new Date().getTime();
+            const duration = (rideEndTime - rideStartTime) / 1000; // in seconds
+            const distance = currentRide.distance;
+            const speed = distance / (duration / 3600); // in km/h
+
+            currentRide.endLocation = { lat: marker.getLatLng().lat, lng: marker.getLatLng().lng };
+            currentRide.distance = distance;
+            currentRide.duration = duration;
+            currentRide.speed = speed;
+            currentRide.endTime = rideEndTime;
+
+            rides.push(currentRide);
+            localStorage.setItem('rides', JSON.stringify(rides));
+
+            // Add polyline to the map
+            const polyline = L.polyline([
+                currentRide.startLocation,
+                currentRide.endLocation
+            ], { color: 'red' }).addTo(map);
+            map.fitBounds(polyline.getBounds());
+
+            document.getElementById('startRideButton').classList.remove('hidden');
+            document.getElementById('activeRideInfo').classList.add('hidden');
+            document.getElementById('rideNotes').value = '';
+
+            showAlert('Ride stopped successfully!');
+            updateRideTable();
+            updateDashboard();
         }
 
-        function updateRidePosition(position) {
-            const { latitude: newLat, longitude: newLng } = position.coords;
-            marker.setLatLng([newLat, newLng]);
-            map.setView([newLat, newLng]);
-
-            rideCoordinates.push([newLat, newLng]);
-            ridePath.setLatLngs(rideCoordinates);
-
-            if (currentRide.lastLocation) {
-                currentRide.distance += calculateDistance(
-                    currentRide.lastLocation.lat,
-                    currentRide.lastLocation.lng,
-                    newLat,
-                    newLng
-                );
-            }
-            currentRide.lastLocation = { lat: newLat, lng: newLng };
-        }
 
         function calculateDistance(lat1, lon1, lat2, lon2) {
-            const R = 6371; // Earth's radius in kilometers
+            const R = 6371; // Earth's radius in km
             const dLat = (lat2 - lat1) * Math.PI / 180;
             const dLon = (lon2 - lon1) * Math.PI / 180;
             const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
@@ -942,78 +871,46 @@
             return R * c;
         }
 
-        function stopRide() {
-            clearInterval(currentRideInterval);
-            const rideEndTime = new Date().getTime();
-            const duration = (rideEndTime - rideStartTime) / 1000;
-            const distance = currentRide.distance;
-            const speed = distance > 0 ? distance / (duration / 3600) : 0;
-
-            currentRide.endLocation = {
-                lat: marker.getLatLng().lat,
-                lng: marker.getLatLng().lng
-            };
-            currentRide.distance = distance;
-            currentRide.duration = duration;
-            currentRide.speed = speed;
-            currentRide.endTime = rideEndTime;
-            currentRide.coordinates = rideCoordinates;
-
-            rides.push(currentRide);
-            localStorage.setItem('rides', JSON.stringify(rides));
-
-            document.getElementById('startRideButton').classList.remove('hidden');
-            document.getElementById('activeRideInfo').classList.add('hidden');
-            document.getElementById('rideNotes').value = '';
-
-            showAlert('Ride stopped successfully!');
-            updateRideTable();
-            updateDashboard();
-
-            // Keep the map visible with the complete route
-            if (map && ridePath) {
-                map.fitBounds(ridePath.getBounds());
-            }
-        }
-
-        function updateDashboard() {
-            const userTrips = trips.filter(t => t.user === currentUser);
-            const totalExpenses = userTrips.reduce((sum, trip) =>
-                sum + trip.expenses.reduce((tripSum, expense) => tripSum + expense.amount, 0), 0);
+        function updateRideTable() {
+            const tbody = document.getElementById('rideTableBody');
+            tbody.innerHTML = '';
 
             const userRides = rides.filter(r => r.user === currentUser);
-            const totalDistance = userRides.reduce((sum, ride) => sum + ride.distance, 0);
-
-            document.getElementById('totalRides').textContent = userRides.length;
-            document.getElementById('totalDistance').textContent = `${totalDistance.toFixed(2)} km`;
-            document.getElementById('totalExpenses').textContent =
-                `₹${totalExpenses.toLocaleString('en-IN', { maximumFractionDigits: 2 })}`;
-
-            updateRecentActivities(userTrips, userRides);
+            userRides.forEach(ride => {
+                const row = tbody.insertRow();
+                const date = new Date(ride.startTime);
+                row.innerHTML = `
+                    <td>${date.toLocaleDateString()}</td>
+                    <td>${ride.type}</td>
+                    <td>${ride.distance.toFixed(2)} km</td>
+                    <td>${Math.floor(ride.duration / 60)} min</td>
+                    <td>${ride.speed.toFixed(2)} km/h</td>
+                    <td>${ride.notes}</td>
+                `;
+            });
         }
 
         function filterRides() {
             const filterType = document.getElementById('rideTypeFilter').value;
             const tbody = document.getElementById('rideTableBody');
-            if (!tbody) return;
-
             tbody.innerHTML = '';
 
-            const filteredRides = rides
-                .filter(r => r.user === currentUser && (filterType === '' || r.type === filterType))
-                .sort((a, b) => b.startTime - a.startTime);
+            const filteredRides = rides.filter(r =>
+                r.user === currentUser &&
+                (filterType === '' || r.type === filterType)
+            );
 
             filteredRides.forEach(ride => {
                 const row = tbody.insertRow();
                 const date = new Date(ride.startTime);
                 row.innerHTML = `
-            <td>${date.toLocaleDateString()}</td>
-            <td>${ride.type}</td>
-            <td>${ride.distance.toFixed(2)} km</td>
-            <td>${Math.floor(ride.duration / 60)} min</td>
-            <td>${ride.speed.toFixed(2)} km/h</td>
-            <td>${ride.notes || ''}</td>
-        `;
+                    <td>${date.toLocaleDateString()}</td>
+                    <td>${ride.type}</td>
+                    <td>${ride.distance.toFixed(2)} km</td>
+                    <td>${Math.floor(ride.duration / 60)} min</td>
+                    <td>${ride.speed.toFixed(2)} km/h</td>
+                    <td>${ride.notes}</td>
+                `;
             });
         }
 
@@ -1030,19 +927,16 @@
             updateRecentActivities(userExpenses, userRides);
         }
 
-        function updateRecentActivities(userTrips, userRides) {
+        function updateRecentActivities(userExpenses, userRides) {
             const recentActivities = document.getElementById('recentActivities');
-            if (!recentActivities) return;
-
             recentActivities.innerHTML = '';
 
             const activities = [
-                ...userTrips.flatMap(trip => trip.expenses.map(e => ({
+                ...userExpenses.map(e => ({
                     type: 'expense',
                     date: new Date(e.date),
-                    data: e,
-                    tripName: trip.name
-                }))),
+                    data: e
+                })),
                 ...userRides.map(r => ({
                     type: 'ride',
                     date: new Date(r.startTime),
@@ -1052,24 +946,21 @@
 
             activities.forEach(activity => {
                 const div = document.createElement('div');
-                div.className = 'activity-item card';
+                div.className = 'activity-item';
                 if (activity.type === 'expense') {
                     div.innerHTML = `
-                <p>${activity.date.toLocaleDateString()} - 
-                Trip: ${activity.tripName}<br>
-                ${activity.data.category} expense: ₹${activity.data.amount.toFixed(2)}</p>
-            `;
+                        <p>${activity.date.toLocaleDateString()} - 
+                        Added ${activity.data.category} expense: $${activity.data.amount.toFixed(2)}</p>
+                    `;
                 } else {
                     div.innerHTML = `
-                <p>${activity.date.toLocaleDateString()} - 
-                ${activity.data.type} ride<br>
-                Distance: ${activity.data.distance.toFixed(2)} km</p>
-            `;
+                        <p>${activity.date.toLocaleDateString()} - 
+                        Completed ${activity.data.type} ride: ${activity.data.distance.toFixed(2)} km</p>
+                    `;
                 }
                 recentActivities.appendChild(div);
             });
         }
-
 
         function addTrip(event) {
             event.preventDefault();
@@ -1079,84 +970,38 @@
                 return;
             }
 
-            const tripName = document.getElementById('tripName').value.trim();
-            const tripMembers = document.getElementById('tripMembers').value
-                .split(',')
-                .map(m => m.trim())
-                .filter(m => m.length > 0);
-
-            if (!tripName || tripMembers.length === 0) {
-                showAlert('Please enter trip name and at least one member.', 'danger');
-                return;
-            }
+            const tripName = document.getElementById('tripName').value;
+            const tripMembers = document.getElementById('tripMembers').value.split(',').map(m => m.trim());
 
             const newTrip = {
                 id: Date.now(),
                 name: tripName,
                 members: tripMembers,
                 expenses: [],
-                user: currentUser,
-                createdAt: new Date().toISOString()
+                user: currentUser
             };
 
             trips.push(newTrip);
             localStorage.setItem('trips', JSON.stringify(trips));
             showAlert('Trip added successfully!');
-            event.target.reset();
+            document.getElementById('tripName').value = '';
+            document.getElementById('tripMembers').value = '';
             updateTripList();
         }
 
-
         function updateTripList() {
             const tripSelect = document.getElementById('tripSelect');
-            if (!tripSelect) return;
-
             tripSelect.innerHTML = '<option value="">Select a trip</option>';
-            const userTrips = trips.filter(t => t.user === currentUser);
 
-            userTrips.forEach(trip => {
+            trips.forEach(trip => {
                 const option = document.createElement('option');
                 option.value = trip.id;
-                option.textContent = trip.name;
-                tripSelect.appendChild(option);
+                option.text = trip.name;
+                tripSelect.add(option);
             });
         }
 
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('en-IN', {
-                style: 'currency',
-                currency: 'INR'
-            }).format(amount);
-        }
-
-        function formatDate(date) {
-            return new Date(date).toLocaleDateString('en-IN', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-            });
-        }
-
-        function formatDuration(seconds) {
-            const minutes = Math.floor(seconds / 60);
-            const hours = Math.floor(minutes / 60);
-            const remainingMinutes = minutes % 60;
-
-            if (hours > 0) {
-                return `${hours}h ${remainingMinutes}m`;
-            }
-            return `${minutes}m`;
-        }
         // Initialize the app when the page loads
-
-        window.addEventListener('beforeunload', () => {
-            if (currentRideInterval) {
-                clearInterval(currentRideInterval);
-            }
-            localStorage.setItem('rides', JSON.stringify(rides));
-            localStorage.setItem('trips', JSON.stringify(trips));
-            localStorage.setItem('expenses', JSON.stringify(expenses));
-        });
         window.addEventListener('load', initializeApp);
     </script>
 </body>
